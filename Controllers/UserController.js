@@ -1,6 +1,7 @@
 const User = require("../Models/UserModel");
 const bcrypt = require("bcryptjs");
-const generateToken = require("../Configs/JwtToken");
+const {token,adminToken} = require("../Configs/JwtToken");
+const generateToken=token;
 
 // account creation function
 const userRegister = async (req, res) => {
