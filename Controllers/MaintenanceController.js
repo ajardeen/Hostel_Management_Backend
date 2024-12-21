@@ -3,6 +3,7 @@ const User = require("../Models/UserModel");
 //create Maintenance request from resident
 const createMaintenanceRequest = async (req, res) => {
   try {
+    
     const { residentId, issueDetails, priority } = req.body;
     const resident = User.findOne({ _id: residentId });
     if (!resident) {
@@ -44,19 +45,23 @@ const getAllMaintenanceRequest = async (req, res) => {
 //admin assign maintenance request to staff
 const assignMaintenance = async (req, res) => {
   try {
-    const { id } = req.params; // Maintenance request id
-    const { assignedTo } = req.body; // Staff ID
+    console.log("assigned");
+    
+    const { assignedTo ,id} = req.body; // Staff ID and Maintenance request id
 
     const updatedRequest = await MaintenanceRequest.findByIdAndUpdate(
       id,
       { assignedTo, status: "In Progress", updatedAt: Date.now() },
       { new: true }
     );
-
+    console.log(updatedRequest);
+    
     res
       .status(200)
       .json({ message: "Request assigned successfully", updatedRequest });
   } catch (error) {
+    console.log(error.message);
+    
     res
       .status(500)
       .json({ message: "Failed to assign maintenance request", error });
@@ -97,6 +102,8 @@ const staffMaintenanceStatusUpdate = async (req, res) => {
     res.status(500).json({ message: "Failed to update request status", error });
   }
 };
+
+
 
 module.exports = {
   createMaintenanceRequest,

@@ -20,6 +20,7 @@ const MaintenanceRequestSchema = new mongoose.Schema({
   assignedTo:{
     type:mongoose.Schema.Types.ObjectId,
     ref:"User",
+    default:null,
     required:false,
   },
   createdAt: { type: Date, default: Date.now },

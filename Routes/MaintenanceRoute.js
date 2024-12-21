@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+//maintenance controller
 const {
   createMaintenanceRequest,
   getAllMaintenanceRequest,
@@ -7,6 +8,11 @@ const {
   getResidentMaintenance,
   staffMaintenanceStatusUpdate,
 } = require("../Controllers/MaintenanceController");
+
+//staff controller
+const { getAllStaff } = require("../Controllers/StaffController");
+
+router.get("/getstaffs", getAllStaff);
 
 //by resident
 router.post("/create-maintenance-requests", createMaintenanceRequest);
@@ -17,8 +23,9 @@ router.get(
 
 //by admin
 router.get("/maintenance-requests", getAllMaintenanceRequest);
-router.post("/maintenance-requests/:id/assign", assignMaintenance);
+router.put("/maintenance-requests/assign", assignMaintenance);
+
 
 //by staff
-router.put("/maintenance-requests/:id/status",staffMaintenanceStatusUpdate);
+router.put("/maintenance-requests/:id/status", staffMaintenanceStatusUpdate);
 module.exports = router;

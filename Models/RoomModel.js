@@ -11,6 +11,8 @@ const roomSchema = new mongoose.Schema({
     default: "Available",
   },
   features: { type: Object, default: { AC: false, WIFI: true } }, // e.g., { "AC": true, "WiFi": true }
+  roomfees: { type: Number, required: true }, // e.g., 10000 this is per month
+  preferences: { type: String, default: false }, // E.g., ['Near window', 'First floor']
   createdAt: { type: Date, default: Date.now }, // current date added
   updatedAt: { type: Date, default: Date.now }, // current date added
 });

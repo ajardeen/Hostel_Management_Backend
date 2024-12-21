@@ -5,7 +5,7 @@ const generateToken=token;
 
 // account creation function
 const userRegister = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password ,role='resident',preferences} = req.body;
   try {
     if (username && email && password) {
       //Checking user already registered in DB
@@ -17,7 +17,7 @@ const userRegister = async (req, res) => {
           .json({ message: "User already registered Please try login" });
       } else {
         //if not found in db proceed to create account
-        const newUser = User({ username, email, password });
+        const newUser = User({ username, email, password ,role,preferences});
         await newUser.save();
         res
           .status(201)
@@ -58,7 +58,7 @@ const userLogin = async (req, res) => {
           await user.save();
           res
             .status(200)
-            .json({ message: "Login Successfully", token: token });
+            .json({ message: "Login Successfully", token: token ,userid:user._id,role:user.role,username:user.username});
         } else {
           res
             .status(401)

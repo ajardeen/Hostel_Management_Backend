@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
   token: {
     type: String,
   },
+  preferences: {
+    type: String,
+    default: "no Preferences",
+  },
 });
 
 // Hash password before saving the user
