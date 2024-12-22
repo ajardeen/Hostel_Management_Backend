@@ -50,11 +50,22 @@ const createRoom = async (req, res) => {
 // creating room assignment of the person
 const roomAssignment = async (req, res) => {
   try {
-    const { residentId, roomId, checkInDate, checkOutDate, status, occupied } =
-      req.body;
+    const {
+      residentId,
+      roomId,
+      checkInDate,
+      checkOutDate,
+      status,
+      occupied,
+      utilities,
+    } = req.body;
 
     // Check if the room is available
     const room = await Room.findById(roomId);
+    const resident = await User.findById(residentId);
+    if (!resident) {
+      return res.status(400).json({ message: "Resident not found" });
+    }
     if (!room) {
       return res.status(400).json({ message: "Room not found" });
     }
@@ -75,6 +86,7 @@ const roomAssignment = async (req, res) => {
       checkInDate,
       checkOutDate,
       status,
+      utilities,
     });
 
     // Update room status and Occupied
@@ -87,13 +99,19 @@ const roomAssignment = async (req, res) => {
 
     await room.save();
     await newAssignment.save();
+    // Update resident account details for checkIn date and checkout date in user
+    resident.account.CheckInDate = checkInDate;
+    resident.account.CheckOutDate = checkOutDate;
+    await resident.save();
 
     res
       .status(201)
       .json({ message: "Room assigned successfully", newAssignment });
   } catch (error) {
     console.error("Room assignment error:", error);
-    res.status(500).json({ message: "Error assigning room", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error assigning room", error: error.message });
   }
 };
 

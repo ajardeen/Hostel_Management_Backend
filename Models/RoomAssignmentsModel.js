@@ -9,6 +9,18 @@ const assignmentSchema = new mongoose.Schema({
   occupied: { type: Number, required: true, default: 1 },
   checkInDate: { type: Date, required: true },
   checkOutDate: { type: Date, required: true },
+  utilities: { 
+    type: Object, 
+    required: false, 
+    default: {
+      washing: 200,
+      electricity: 500,
+      water: 0,
+      internet: 0,
+      maintenance: 200,
+      cleaning: 150,
+    }
+  },
   status: {
     type: String,
     enum: ["Checked In", "Checked Out", "Reserved"],

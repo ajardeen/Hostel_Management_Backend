@@ -24,6 +24,15 @@ const userSchema = new mongoose.Schema({
     enum: ["admin", "staff", "resident"],
     default: "resident",
   },
+  account: {
+    firstName: String,
+    lastName: String,
+    phone: Number,
+    address: String,
+    emergencyContact: Number,
+    CheckInDate: Date,
+    CheckOutDate: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now,

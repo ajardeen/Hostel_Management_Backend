@@ -4,6 +4,8 @@ require("dotenv").config();
 
 // Resident user auth Middleware 
 const authMiddleware = async (req, res, next) => {
+  console.log("authMiddleware called");
+  
   try {
     // Check if the Authorization header exists and starts with "Bearer"
     if (
@@ -29,7 +31,8 @@ const authMiddleware = async (req, res, next) => {
 
     // Attach the user to the request object
     req.user = user;
-
+    console.log("resident authorized");
+    
     // Proceed to the next middleware or route
     next();
   } catch (error) {
