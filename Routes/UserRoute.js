@@ -13,7 +13,7 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 router.post("/register", userRegister);
 router.post("/login", userLogin);
 router.get("/userdashboard", authMiddleware, userDashboard);
-router.put("/updateaccount/:id", userAccountUpdate);
-router.get("/useraccountdetails/:id", userAccountDetails);
+router.put("/updateaccount/:id",authMiddleware, userAccountUpdate);
+router.get("/useraccountdetails/:id",authMiddleware, userAccountDetails);
 
 module.exports = router;

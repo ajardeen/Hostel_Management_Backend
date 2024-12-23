@@ -74,6 +74,7 @@ const userLogin = async (req, res) => {
               firstName: user.firstName?user.firstName: false,
               lastName: user.lastName?user.lastName: false,
               username: user.username,
+              email: user.email,
             });
         } else {
           res

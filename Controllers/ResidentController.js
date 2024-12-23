@@ -46,8 +46,11 @@ const getResidentRoomDetails = async (req, res) => {
       return res.status(404).json({ message: "Room not found" });
     }
     const roomDetails = {
+      roomId: room._id,
+      roomType: room.type,
+      roomFeatures: room.features,
       roomNumber: room.roomNumber,
-      roomType: room.roomType,
+      roomType: room.type,
       roomFees: room.roomfees,
       roomStatus: roomAssignment.status,
       roomOccupancy: room.occupied,

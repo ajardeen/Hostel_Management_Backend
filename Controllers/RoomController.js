@@ -1,7 +1,8 @@
 const Room = require("../Models/RoomModel");
 const RoomAssignment = require("../Models/RoomAssignmentsModel");
 const User = require("../Models/UserModel");
-
+const mailer = require("../Configs/Mailer");
+require("dotenv").config();
 //get all the room details
 const getALLRoomsDetails = async (req, res) => {
   const allRooms = await Room.find();
@@ -64,12 +65,12 @@ const roomAssignment = async (req, res) => {
     const room = await Room.findById(roomId);
     const resident = await User.findById(residentId);
     if (!resident) {
-      return res.status(400).json({ message: "Resident not found" });
+      return res.status(404).json({ message: "Resident not found" });
     }
     if (!room) {
-      return res.status(400).json({ message: "Room not found" });
+      return res.status(404).json({ message: "Room not found" });
     }
-
+    const findResident = await RoomAssignment.findOne({ residentId });
     // validating room capacity Available
     const availableSlots = room.capacity - room.occupied;
     if (availableSlots < occupied) {
@@ -106,7 +107,39 @@ const roomAssignment = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "Room assigned successfully", newAssignment });
+      .json({ message: "Room assigned and Mail is Sended ", newAssignment });
+
+    // Send mail
+    await mailer.sendMail({
+      from: process.env.SMTP_USER,
+      to: resident.email, 
+      subject: `Room Assigned Successfully`,
+      html: `
+      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+              <div style="background-color: #4caf50; color: #ffffff; padding: 20px; text-align: center;">
+                  <h1 style="margin: 0;">Hi ${resident.username}</h1>
+              </div>
+              <div style="padding: 20px;">
+                  <p>We are pleased to inform you that your room has been successfully assigned.</p>
+                  <p>Room No:${room.roomNumber}</p>
+                  <p>Click the button below to login into website and view your room:</p>
+                  <div style="text-align: center; margin: 20px 0;">
+                      <a href="http://localhost:5173/" style="background-color: #4caf50; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-size: 16px;">
+                          Login
+                      </a>
+                  </div>
+                  <p>If you have any questions, feel free to contact us.</p>
+                  <p>Thank you,</p>
+                  <p><strong>Hostel Management Team</strong></p>
+              </div>
+              <div style="background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 12px; color: #777;">
+                  <p>This is an automated message. Please do not reply.</p>
+              </div>
+          </div>
+      </div>
+  `,
+    });
   } catch (error) {
     console.error("Room assignment error:", error);
     res
@@ -140,35 +173,6 @@ const updateRoomAssignments = async (req, res) => {
   }
 };
 
-//viewing all room assignments ,including check in check out
-const getRoomOccupancy = async (req, res) => {
-  try {
-    // Fetch room occupancy summary
-    const totalRooms = await Room.countDocuments();
-    const occupiedRooms = await Room.countDocuments({
-      availabilityStatus: "Occupied",
-    });
-    const availableRooms = await Room.countDocuments({
-      availabilityStatus: "Available",
-    });
-
-    // Fetch active room assignments with resident details checked in
-    const activeAssignments = await RoomAssignment.find({
-      status: "Checked In",
-    });
-    const inActiveAssignments = await RoomAssignment.find({
-      status: "Checked Out",
-    });
-    res.status(200).json({
-      message: "Successfully",
-      activeAssignments,
-      inActiveAssignments,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching occupancy data", error });
-  }
-};
-
 //get booking room details
 const getRoomById = async (req, res) => {
   try {
@@ -177,7 +181,27 @@ const getRoomById = async (req, res) => {
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
     }
-    res.status(200).json({ message: "Successfully", room });
+    // Fetch all residents
+    const residents = await User.find({ role: "resident" });
+    const residentData = await Promise.all(
+      residents.map(async (resident) => {
+        const hasRoom = await RoomAssignment.findOne({
+          residentId: resident._id,
+        });
+        if (!hasRoom) {
+          return {
+            username: resident.username,
+            residentId: resident._id,
+            residentEmail: resident.email,
+            preferences: resident.preferences,
+          };
+        }
+      })
+    );
+    const filteredResidentData = residentData.filter(Boolean);
+    res
+      .status(200)
+      .json({ message: "Successfully", room, filteredResidentData });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch room details", error });
   }
@@ -204,7 +228,6 @@ module.exports = {
   getALLRoomsDetails,
   createRoom,
   roomAssignment,
-  getRoomOccupancy,
   updateRoomAssignments,
   getRoomById,
   getAllResidents,

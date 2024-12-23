@@ -45,7 +45,7 @@ const getAllMaintenanceRequest = async (req, res) => {
 //admin assign maintenance request to staff
 const assignMaintenance = async (req, res) => {
   try {
-    console.log("assigned");
+  
     
     const { assignedTo ,id} = req.body; // Staff ID and Maintenance request id
 
@@ -89,7 +89,7 @@ const staffMaintenanceStatusUpdate = async (req, res) => {
   try {
     const { id } = req.params; // Maintenance request id
     const { status } = req.body; // Maintenance request status
-    console.log("status update");
+   
 
     const updatedRequest = await MaintenanceRequest.findByIdAndUpdate(
       id,

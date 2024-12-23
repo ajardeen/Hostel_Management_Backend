@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const assignmentSchema = new mongoose.Schema({
   residentId: {
     type: mongoose.Schema.Types.ObjectId,
