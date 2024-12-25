@@ -1,7 +1,5 @@
 const Revenue = require("../Models/RevenueModel");
 const Expense = require("../Models/ExpensesModel");
-const Occupancy = require("../Models/OccupancyModel");
-const Transaction = require("../Models/TransactionsModel");
 const Room = require("../Models/RoomModel");
 const user = require("../Models/UserModel");
 const RoomAssignment = require("../Models/RoomAssignmentsModel");
@@ -31,9 +29,32 @@ const getDashboardData = async (req, res) => {
       (total, revenue) => total + revenue.totalAmount,
       0
     );
+    const reveData = await Revenue.aggregate([
+      {
+        $group: {
+          _id: "$month",
+          totalAmount: { $sum: "$amount" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const expenseData = await Expense.aggregate([
+      {
+        $group: {
+          _id: "$month",
+          totalAmount: { $sum: "$amount" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+    console.log("revenueData:", reveData);
+    console.log("expenseData:", expenseData);
+    
     const revenueData = {
       totalRevenue,
       revenue,
+      reveData,
     };
 
     const rooms = await Room.find();
@@ -65,6 +86,7 @@ const getDashboardData = async (req, res) => {
     const expensesData = {
       totalExpenses,
       expenses,
+      expenseData,
     };
 
     const residents = await user.find({ role: "resident" });
@@ -72,6 +94,8 @@ const getDashboardData = async (req, res) => {
     const residentData = {
       residents,
     };
+
+   
 
     res.status(200).json({
       message: "Successfully",

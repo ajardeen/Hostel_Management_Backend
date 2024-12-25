@@ -6,6 +6,7 @@ const billingSchema = new mongoose.Schema({
     ref: "Resident",
     required: true,
   },
+  invoiceNumber:{type:String,required:true},
   roomNumber: { type: String, required: true },
   roomFee: { type: Number, required: true },
   utilities: { type: Number, default: 0 },
@@ -13,7 +14,7 @@ const billingSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
   lateFee: { type: Number, default: 0 },
   billingAmount: { type: Number, required: true },
-  billingDate: { type: Date, default: Date.now },
+  billingDate: { type: Date, required:true ,default: Date.now },
   paymentStatus: {
     type: String,
     enum: ["Paid", "Pending", "Failed"],
@@ -22,8 +23,8 @@ const billingSchema = new mongoose.Schema({
   paymentHistory: [
     {
       amountPaid: { type: Number },
-      paymentDate: { type: Date },
-      method: { type: String, enum: ["Card", "PayPal", "BankTransfer"] },
+      paymentDate: { type: Date ,default: Date.now},
+      method: { type: String, enum: ["Card", "PayPal", "BankTransfer"],default:"PayPal" },
     },
   ],
 });

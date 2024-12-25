@@ -112,7 +112,7 @@ const roomAssignment = async (req, res) => {
     // Send mail
     await mailer.sendMail({
       from: process.env.SMTP_USER,
-      to: resident.email, 
+      to: resident.email,
       subject: `Room Assigned Successfully`,
       html: `
       <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
@@ -224,6 +224,64 @@ const getAllResidents = async (req, res) => {
   }
 };
 
+// getting all room assignments
+const getAllAssignedRooms = async (req, res) => {
+  try {
+    const roomAssignments = await RoomAssignment.find();
+    res.status(200).json({ message: "Successfully", roomAssignments });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "unSuccessful" });
+  }
+};
+const updateRoomAssignmentsDates = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data } = req.body;
+    const roomAssign = await RoomAssignment.findById(id);
+    if (!roomAssign) {
+      return res.status(404).json({ message: "not found" });
+    }
+    roomAssign.checkInDate = data.checkInDate;
+    roomAssign.checkOutDate = data.checkOutDate;
+    await roomAssign.save();
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "unSuccessful" });
+  }
+};
+const deleteRoomAssignment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const roomAssign = await RoomAssignment.findById(id);
+    const room = await Room.findById(roomAssign.roomId);
+    room.occupied -= roomAssign.occupied;
+    room.availabilityStatus = "Available";
+    await room.save();
+    await RoomAssignment.findByIdAndDelete(id);
+    res.status(200).json({ message: "Successfully deleted" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "error" });
+  }
+};
+
+// delete room 
+const deleteRoom = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const room = await Room.findById(id);
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+    await Room.findByIdAndDelete(id);
+    res.status(200).json({ message: "Successfully deleted" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "error" });
+  }
+};
+
 module.exports = {
   getALLRoomsDetails,
   createRoom,
@@ -231,4 +289,8 @@ module.exports = {
   updateRoomAssignments,
   getRoomById,
   getAllResidents,
+  getAllAssignedRooms,
+  updateRoomAssignmentsDates,
+  deleteRoomAssignment,
+  deleteRoom,
 };

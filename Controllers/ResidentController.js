@@ -117,7 +117,7 @@ const generateInvoice = async (req, res) => {
       
     const tax = 0.1 * subTotal;
     const total = subTotal + tax;
-    console.log(total);
+  
     
     const invoiceDetails = {
       invoiceNumber,
