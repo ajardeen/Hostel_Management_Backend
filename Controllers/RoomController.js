@@ -70,7 +70,7 @@ const roomAssignment = async (req, res) => {
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
     }
-    const findResident = await RoomAssignment.findOne({ residentId });
+   
     // validating room capacity Available
     const availableSlots = room.capacity - room.occupied;
     if (availableSlots < occupied) {
@@ -91,7 +91,7 @@ const roomAssignment = async (req, res) => {
     });
 
     // Update room status and Occupied
-    room.occupied += occupied;
+    room.occupied += parseInt(occupied);
     if (room.occupied >= room.capacity) {
       room.availabilityStatus = "Occupied";
     } else {

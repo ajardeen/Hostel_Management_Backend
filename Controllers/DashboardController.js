@@ -6,8 +6,6 @@ const RoomAssignment = require("../Models/RoomAssignmentsModel");
 
 const getDashboardData = async (req, res) => {
   try {
-    // Calculate revenue, expenses, occupancy, and transactions
-    // const revenue = await Revenue.aggregate([]);
     const staff = await user.find({ role: "staff" });
     const totalStaff = staff.length;
     const staffNames = staff.map((staff) => staff.username);

@@ -1,20 +1,28 @@
 const MaintenanceRequest = require("../Models/MaintenanceModel");
 const User = require("../Models/UserModel");
 const Expense = require("../Models/ExpensesModel");
+const Room = require("../Models/RoomModel");
 //create Maintenance request from resident
 const createMaintenanceRequest = async (req, res) => {
   try {
-    const { residentId, issueDetails, priority } = req.body;
-    const resident = User.findOne({ _id: residentId });
+    const { residentId, issueDetails, priority,roomId } = req.body;
+   
+    const resident = await User.findOne({ _id: residentId });
+    const room = await Room.findById(roomId);
+    
     if (!resident) {
       return res.status(404).json({
         message: "User not found so maintenance request not assigned",
       });
     }
+   
+    const roomNumber = room.roomNumber;
     const newRequest = new MaintenanceRequest({
       residentId,
       issueDetails,
       priority,
+      roomId,
+      roomNumber,
     });
 
     await newRequest.save();

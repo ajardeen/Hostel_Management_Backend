@@ -57,28 +57,15 @@ const getResidentRoomDetails = async (req, res) => {
       checkInDate: roomAssignment.checkInDate,
       checkOutDate: roomAssignment.checkOutDate,
     };
+    console.log(roomDetails);
+    
     res.status(200).json({ message: "Successfully", roomDetails });
   } catch (error) {
     res.status(500).json({ message: "Internal Server", error });
   }
 };
 
-//checkout resident from the room
-const checkoutResident = async (req, res) => {
-  try {
-    const { residentId } = req.params;
-    const roomAssignment = await RoomAssignment.findOne({ residentId });
-    if (!roomAssignment) {
-      return res.status(404).json({ message: "Room assignment not found" });
-    }
-    roomAssignment.status = "Checked Out";
-    roomAssignment.checkOutDate = new Date();
-    await roomAssignment.save();
-    res.status(200).json({ message: "Resident checked out successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Error checking out resident", error });
-  }
-};
+
 //generate invoice for the resident specific
 const generateInvoice = async (req, res) => {
   try {
@@ -91,7 +78,7 @@ const generateInvoice = async (req, res) => {
     if (!roomAssignment) {
       return res.status(404).json({ message: "Room assignment not found" });
     }
-    const { roomId, checkInDate, checkOutDate, utilities } = roomAssignment;
+    const { roomId, checkInDate, checkOutDate, utilities,occupied } = roomAssignment;
     const room = await Room.findById(roomId);
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
@@ -104,9 +91,10 @@ const generateInvoice = async (req, res) => {
     const invoiceNumber = `INV-${invoiceDate.getFullYear()}-${
       invoiceDate.getMonth() + 1
     }-${invoiceDate.getDate()}-${Math.floor(Math.random() * 1000)}`;
+
    
     const subTotal =
-      roomfees +
+     ( roomfees * occupied) +
       washing +
       electricity +
       water +
@@ -115,7 +103,7 @@ const generateInvoice = async (req, res) => {
       cleaning;
      
       
-    const tax = 0.1 * subTotal;
+    const tax = 0.10 * subTotal;
     const total = subTotal + tax;
   
     
@@ -126,7 +114,8 @@ const generateInvoice = async (req, res) => {
       email,
       roomNumber,
       roomType,
-      roomfees,
+      roomfees: roomfees * occupied,
+      occupied,
       checkInDate,
       checkOutDate,
       washing,
