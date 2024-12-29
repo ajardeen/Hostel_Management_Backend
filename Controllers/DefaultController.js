@@ -2,7 +2,7 @@ const express = require("express");
 
 //Home Page routing function
 const homePage = (req,res)=>{
-    res.send("Welcome to Home Page");
+    res.send("Backend server is up and running");
 }
 
 
