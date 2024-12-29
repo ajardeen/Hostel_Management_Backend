@@ -1,7 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {getMaintenanceRequestByStaffId} = require('../controllers/StaffController');
+const {
+  getMaintenanceRequestByStaffId,
+} = require("../Controllers/StaffController");
 
-router.get('/maintenance-requests/:id', getMaintenanceRequestByStaffId);
+router.get("/maintenance-requests/:id", getMaintenanceRequestByStaffId);
 
 module.exports = router;
